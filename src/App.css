@@ -37,7 +37,16 @@ body {
   border-color: yellow;
 }
 
+.completa {
+  border-color: lime;
+}
+
 .quadrado {
   height: 40px;
   margin-top: 3px;
+}
+
+.ganhou {
+  font-size: 20px;
+  margin-bottom: 20px;
 }

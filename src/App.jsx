@@ -66,11 +66,19 @@ function mover(origem, destino) {
 }
 
 function App() {
+  const [nivel, setNivel] = useState(1);
   const [garrafas, setGarrafas] = useState(gerarNivel(1));
   const [selecionada, setSelecionada] = useState(-1);
   const [movimentos, setMovimentos] = useState(0);
 
+  let ganhou = true;
+  for (let i = 0; i < garrafas.length; i++) {
+    if (garrafas[i].length > 0 && !completa(garrafas[i])) ganhou = false;
+  }
+
   function clicar(i) {
+    if (ganhou) return;
+
     if (selecionada == -1) {
       if (garrafas[i].length > 0 && !completa(garrafas[i])) {
         setSelecionada(i);
@@ -98,10 +106,20 @@ function App() {
     }
   }
 
+  function novoJogo(n) {
+    let novas = gerarNivel(n);
+    setNivel(n);
+    setGarrafas(novas);
+    setMovimentos(0);
+    setSelecionada(-1);
+  }
+
   return (
     <div className="container">
       <h1>Magic Sort</h1>
-      <p className="info">Movimentos: {movimentos}</p>
+      <p className="info">
+        Nível {nivel} de 4 | Movimentos: {movimentos}
+      </p>
 
       <div className="garrafas">
         {garrafas.map((g, i) => (
@@ -109,10 +127,28 @@ function App() {
             key={i}
             garrafa={g}
             selecionada={selecionada == i}
+            completa={completa(g)}
             onClick={() => clicar(i)}
           />
         ))}
       </div>
+
+      {ganhou && nivel < 4 && (
+        <div className="ganhou">
+          <p>
+            Você passou do nível {nivel} com {movimentos}{" "}
+            {movimentos == 1 ? "movimento" : "movimentos"}!
+          </p>
+          <button onClick={() => novoJogo(nivel + 1)}>Próximo nível</button>
+        </div>
+      )}
+
+      {ganhou && nivel == 4 && (
+        <div className="ganhou">
+          <p>Parabéns, você zerou o jogo!</p>
+          <button onClick={() => novoJogo(1)}>Jogar de novo</button>
+        </div>
+      )}
     </div>
   );
 }
