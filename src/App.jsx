@@ -48,16 +48,69 @@ function gerarNivel(nivel) {
   return garrafas;
 }
 
+function podeMover(origem, destino) {
+  if (origem.length == 0 || completa(origem)) return false;
+  if (destino.length == 4) return false;
+  if (destino.length == 0) return true;
+  return origem[origem.length - 1] == destino[destino.length - 1];
+}
+
+function mover(origem, destino) {
+  let o = [...origem];
+  let d = [...destino];
+  let cor = o[o.length - 1];
+  while (o.length > 0 && o[o.length - 1] == cor && d.length < 4) {
+    d.push(o.pop());
+  }
+  return [o, d];
+}
+
 function App() {
   const [garrafas, setGarrafas] = useState(gerarNivel(1));
+  const [selecionada, setSelecionada] = useState(-1);
+  const [movimentos, setMovimentos] = useState(0);
+
+  function clicar(i) {
+    if (selecionada == -1) {
+      if (garrafas[i].length > 0 && !completa(garrafas[i])) {
+        setSelecionada(i);
+      }
+      return;
+    }
+
+    if (selecionada == i) {
+      setSelecionada(-1);
+      return;
+    }
+
+    if (podeMover(garrafas[selecionada], garrafas[i])) {
+      let resultado = mover(garrafas[selecionada], garrafas[i]);
+      let novas = [...garrafas];
+      novas[selecionada] = resultado[0];
+      novas[i] = resultado[1];
+      setGarrafas(novas);
+      setMovimentos(movimentos + 1);
+      setSelecionada(-1);
+    } else if (garrafas[i].length > 0 && !completa(garrafas[i])) {
+      setSelecionada(i);
+    } else {
+      setSelecionada(-1);
+    }
+  }
 
   return (
     <div className="container">
       <h1>Magic Sort</h1>
+      <p className="info">Movimentos: {movimentos}</p>
 
       <div className="garrafas">
         {garrafas.map((g, i) => (
-          <Garrafa key={i} garrafa={g} />
+          <Garrafa
+            key={i}
+            garrafa={g}
+            selecionada={selecionada == i}
+            onClick={() => clicar(i)}
+          />
         ))}
       </div>
     </div>
