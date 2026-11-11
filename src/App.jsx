@@ -68,7 +68,9 @@ function mover(origem, destino) {
 function App() {
   const [nivel, setNivel] = useState(1);
   const [garrafas, setGarrafas] = useState(gerarNivel(1));
+  const [inicio, setInicio] = useState(garrafas);
   const [selecionada, setSelecionada] = useState(-1);
+  const [historico, setHistorico] = useState([]);
   const [movimentos, setMovimentos] = useState(0);
 
   let ganhou = true;
@@ -96,6 +98,7 @@ function App() {
       let novas = [...garrafas];
       novas[selecionada] = resultado[0];
       novas[i] = resultado[1];
+      setHistorico([...historico, garrafas]);
       setGarrafas(novas);
       setMovimentos(movimentos + 1);
       setSelecionada(-1);
@@ -106,10 +109,27 @@ function App() {
     }
   }
 
+  function desfazer() {
+    if (historico.length == 0) return;
+    setGarrafas(historico[historico.length - 1]);
+    setHistorico(historico.slice(0, historico.length - 1));
+    setMovimentos(movimentos - 1);
+    setSelecionada(-1);
+  }
+
+  function reiniciar() {
+    setGarrafas(inicio);
+    setHistorico([]);
+    setMovimentos(0);
+    setSelecionada(-1);
+  }
+
   function novoJogo(n) {
     let novas = gerarNivel(n);
     setNivel(n);
     setGarrafas(novas);
+    setInicio(novas);
+    setHistorico([]);
     setMovimentos(0);
     setSelecionada(-1);
   }
@@ -149,6 +169,14 @@ function App() {
           <button onClick={() => novoJogo(1)}>Jogar de novo</button>
         </div>
       )}
+
+      <div className="botoes">
+        <button onClick={desfazer} disabled={historico.length == 0 || ganhou}>
+          Desfazer
+        </button>
+        <button onClick={reiniciar}>Reiniciar</button>
+        <button onClick={() => novoJogo(nivel)}>Novo jogo</button>
+      </div>
     </div>
   );
 }
