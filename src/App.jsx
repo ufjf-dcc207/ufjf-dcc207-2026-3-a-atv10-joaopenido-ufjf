@@ -12,6 +12,13 @@ function completa(garrafa) {
   return true;
 }
 
+function soUmaCor(garrafa) {
+  for (let i = 1; i < garrafa.length; i++) {
+    if (garrafa[i] != garrafa[0]) return false;
+  }
+  return true;
+}
+
 function gerarNivel(nivel) {
   let qtd = nivel + 2;
   let garrafas = [];
@@ -65,6 +72,19 @@ function mover(origem, destino) {
   return [o, d];
 }
 
+function travou(garrafas) {
+  for (let i = 0; i < garrafas.length; i++) {
+    for (let j = 0; j < garrafas.length; j++) {
+      if (i != j && podeMover(garrafas[i], garrafas[j])) {
+        if (!(garrafas[j].length == 0 && soUmaCor(garrafas[i]))) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
 function App() {
   const [nivel, setNivel] = useState(1);
   const [garrafas, setGarrafas] = useState(gerarNivel(1));
@@ -77,6 +97,8 @@ function App() {
   for (let i = 0; i < garrafas.length; i++) {
     if (garrafas[i].length > 0 && !completa(garrafas[i])) ganhou = false;
   }
+
+  let travado = !ganhou && travou(garrafas);
 
   function clicar(i) {
     if (ganhou) return;
@@ -152,6 +174,10 @@ function App() {
           />
         ))}
       </div>
+
+      {travado && (
+        <p className="aviso">Sem jogadas possíveis! Desfaz ou reinicia o nível.</p>
+      )}
 
       {ganhou && nivel < 4 && (
         <div className="ganhou">
